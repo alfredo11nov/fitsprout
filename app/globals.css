@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { background: #FFF9EC; color: #3C3C3C; }
+
+.btn-duo {
+  @apply inline-flex items-center justify-center px-5 py-3 rounded-chunk font-bold uppercase tracking-wide text-white bg-duo-green shadow-chunkGreen active:translate-y-[2px] active:shadow-none transition;
+}
+.btn-duo-soft {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-chunk font-bold bg-white border-2 border-gray-200 shadow-chunk active:translate-y-[2px] active:shadow-none transition;
+}
+.card {
+  @apply bg-white rounded-chunk border-2 border-gray-200 shadow-chunk p-5;
+}
