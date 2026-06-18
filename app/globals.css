@@ -13,3 +13,17 @@ html, body { background: #FFF9EC; color: #3C3C3C; }
 .card {
   @apply bg-white rounded-chunk border-2 border-gray-200 shadow-chunk p-5;
 }
+
+/* Pulse when a daily target value increases (e.g. activity level change) */
+@keyframes targetBump {
+  0%   { transform: scale(1); color: #58A700; }
+  30%  { transform: scale(1.35); color: #58CC02; }
+  100% { transform: scale(1); }
+}
+.target-bump { animation: targetBump 0.6s ease-out; }
+
+@keyframes barFlash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(88,204,2,0); }
+  35%      { box-shadow: 0 0 0 3px rgba(88,204,2,0.5); }
+}
+.bar-flash { animation: barFlash 0.6s ease-out; }

@@ -67,6 +67,12 @@ const DICT_ID: Record<string, string> = {
   // Log view
   "Today's coach":  "Pelatih hari ini",
   "Today's totals": "Total hari ini",
+  "Calories are the energy in your food. Your body uses them to move, think and stay alive. Eat about the same as your target to keep your weight steady — more adds weight, less loses it.":
+    "Kalori adalah energi dalam makanan. Tubuh memakainya untuk bergerak, berpikir, dan hidup. Makan sekitar target agar berat stabil — lebih menambah berat, kurang menurunkan.",
+  "Protein is the building block for muscle. It repairs your body after exercise and keeps you feeling full. Found in chicken, eggs, fish, tofu and beans.":
+    "Protein adalah bahan pembentuk otot. Memperbaiki tubuh setelah olahraga dan membuatmu kenyang. Ada di ayam, telur, ikan, tahu, dan kacang.",
+  "Carbs (carbohydrates) are your body's main fuel for energy. Found in rice, noodles, bread, fruit and sweet drinks. Great around active hours, easy to overeat when resting.":
+    "Karbohidrat adalah bahan bakar utama tubuh. Ada di nasi, mi, roti, buah, dan minuman manis. Bagus di jam aktif, mudah berlebihan saat santai.",
   "Today's log":    "Catatan hari ini",
   "Remove all":     "Hapus semua",
   "Nothing logged yet. Add food below ↓": "Belum ada catatan. Tambah makanan di bawah ↓",

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useProfile } from "@/lib/urlState";
 import { targets, ACTIVITY_OPTIONS } from "@/lib/nutrition";
 import { FOODS, CATEGORY_META, type FoodCategory, type Food } from "@/lib/foods";
@@ -72,9 +72,9 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
         <section className="card !p-3 flex flex-col h-[320px]">
           <h2 className="text-xs uppercase tracking-wide text-gray-500 font-bold mb-2">{tr("Today's totals")}</h2>
           <div className="flex-1 flex flex-col justify-around py-2">
-            <MacroRow label={tr("Calories")} emoji="🔥" value={totals.kcal}    target={t.calories} unit="kcal" color="#FFC800"/>
-            <MacroRow label={tr("Protein")}  emoji="🥩" value={totals.protein} target={t.protein}  unit="g"    color="#FF4B4B"/>
-            <MacroRow label={tr("Carbs")}    emoji="🍚" value={totals.carbs}   target={t.carbs}    unit="g"    color="#1CB0F6"/>
+            <MacroRow label={tr("Calories")} emoji="🔥" value={totals.kcal}    target={t.calories} unit="kcal" color="#FFC800" info={tr("Calories are the energy in your food. Your body uses them to move, think and stay alive. Eat about the same as your target to keep your weight steady — more adds weight, less loses it.")} />
+            <MacroRow label={tr("Protein")}  emoji="🥩" value={totals.protein} target={t.protein}  unit="g"    color="#FF4B4B" info={tr("Protein is the building block for muscle. It repairs your body after exercise and keeps you feeling full. Found in chicken, eggs, fish, tofu and beans.")} />
+            <MacroRow label={tr("Carbs")}    emoji="🍚" value={totals.carbs}   target={t.carbs}    unit="g"    color="#1CB0F6" info={tr("Carbs (carbohydrates) are your body's main fuel for energy. Found in rice, noodles, bread, fruit and sweet drinks. Great around active hours, easy to overeat when resting.")} />
           </div>
         </section>
 
@@ -240,20 +240,62 @@ function MacroDots({ grams, icon, label }: { grams: number; icon: string; label:
   );
 }
 
-function MacroRow({ label, emoji, value, target, unit, color }: { label: string; emoji: string; value: number; target: number; unit: string; color: string }) {
+function MacroRow({ label, emoji, value, target, unit, color, info }: { label: string; emoji: string; value: number; target: number; unit: string; color: string; info?: string }) {
   const pct = Math.min(100, Math.round((value / Math.max(1, target)) * 100));
   const over = value > target;
+
+  // Tooltip open/close + dismiss on outside click
+  const [showInfo, setShowInfo] = useState(false);
+  const popRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showInfo) return;
+    const onDoc = (e: MouseEvent) => {
+      if (popRef.current && !popRef.current.contains(e.target as Node)) setShowInfo(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [showInfo]);
+
+  // Pulse when the daily target changes (e.g. activity level updated)
+  const [bump, setBump] = useState(false);
+  const prevTarget = useRef(target);
+  useEffect(() => {
+    if (prevTarget.current !== target) {
+      prevTarget.current = target;
+      setBump(true);
+      const id = setTimeout(() => setBump(false), 650);
+      return () => clearTimeout(id);
+    }
+  }, [target]);
+
   return (
     <div>
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-1.5 text-sm">
         <span>{emoji}</span>
         <span className="font-extrabold">{label}</span>
+        {info && (
+          <div className="relative" ref={popRef}>
+            <button
+              type="button"
+              onClick={() => setShowInfo(v => !v)}
+              aria-label={`What is ${label}?`}
+              className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold transition ${showInfo ? "bg-duo-green text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"}`}
+            >i</button>
+            {showInfo && (
+              <div className="absolute left-0 top-6 z-30 w-60 bg-duo-ink text-white text-xs font-normal leading-snug rounded-chunk px-3 py-2 shadow-chunk">
+                {info}
+              </div>
+            )}
+          </div>
+        )}
         <span className="ml-auto text-xs text-gray-500">
           <span className={over ? "text-duo-red font-bold" : "font-bold text-duo-ink"}>{Math.round(value)}</span>
-          <span> / {target} {unit}</span>
+          <span> / </span>
+          <span className={`inline-block font-bold ${bump ? "target-bump" : ""}`}>{target}</span>
+          <span> {unit}</span>
         </span>
       </div>
-      <div className="mt-1.5 h-2.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200">
+      <div className={`mt-1.5 h-2.5 w-full rounded-full bg-gray-100 overflow-hidden border border-gray-200 ${bump ? "bar-flash" : ""}`}>
         <div className="h-full rounded-full transition-all duration-300" style={{ width: `${pct}%`, background: over ? "#FF4B4B" : color }} />
       </div>
     </div>
