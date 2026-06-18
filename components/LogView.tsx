@@ -14,7 +14,7 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<FoodCategory>("local");
-  const [tab, setTab] = useState<"food" | "activity">("food");
+  const [logTab, setLogTab] = useState<"log" | "activity">("log");
   const tr = useT();
 
   const totals = entries.reduce(
@@ -52,74 +52,88 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
 
   return (
     <div className="space-y-6">
-      <section className="card">
-        <div className="flex items-center gap-3">
-          <GeminiMascot goal={profile.goal} size={70} mood={feedback.mood} />
-          <div className="flex-1">
-            <div className="text-xs uppercase tracking-wide text-gray-500">{tr("Today's coach")}</div>
-            <div className="font-extrabold">{feedback.title}</div>
-            <div className="text-sm text-gray-600">{feedback.body}</div>
-          </div>
-          {onEditGoal && (
-            <button onClick={onEditGoal} className="text-sm font-bold text-duo-red hover:underline self-start">
-              {tr("✏️ Edit your goal")}
-            </button>
-          )}
-        </div>
-      </section>
-
       <div className="grid md:grid-cols-2 gap-4 md:items-stretch">
-        <section className="card !p-3 flex flex-col h-[320px]">
-          <h2 className="text-xs uppercase tracking-wide text-gray-500 font-bold mb-2">{tr("Today's totals")}</h2>
-          <div className="flex-1 flex flex-col justify-around py-2">
+        {/* TODAY'S TOTALS — avatar coach on top, sliders at the bottom */}
+        <section className="card !p-4 flex flex-col h-[340px]">
+          <div className="flex items-start gap-3">
+            <GeminiMascot goal={profile.goal} size={64} mood={feedback.mood} />
+            <div className="flex-1 min-w-0">
+              <div className="text-xs uppercase tracking-wide text-gray-500 font-bold">{tr("Today's totals")}</div>
+              <div className="font-extrabold text-sm leading-tight">{feedback.title}</div>
+              <div className="text-xs text-gray-600 leading-snug">{feedback.body}</div>
+            </div>
+            {onEditGoal && (
+              <button onClick={onEditGoal} className="text-xs font-bold text-duo-red hover:underline shrink-0">
+                {tr("✏️ Edit your goal")}
+              </button>
+            )}
+          </div>
+          <div className="mt-auto space-y-3 pt-4">
             <MacroRow label={tr("Calories")} emoji="🔥" value={totals.kcal}    target={t.calories} unit="kcal" color="#FFC800" info={tr("Calories are the energy in your food. Your body uses them to move, think and stay alive. Eat about the same as your target to keep your weight steady — more adds weight, less loses it.")} />
             <MacroRow label={tr("Protein")}  emoji="🥩" value={totals.protein} target={t.protein}  unit="g"    color="#FF4B4B" info={tr("Protein is the building block for muscle. It repairs your body after exercise and keeps you feeling full. Found in chicken, eggs, fish, tofu and beans.")} />
             <MacroRow label={tr("Carbs")}    emoji="🍚" value={totals.carbs}   target={t.carbs}    unit="g"    color="#1CB0F6" info={tr("Carbs (carbohydrates) are your body's main fuel for energy. Found in rice, noodles, bread, fruit and sweet drinks. Great around active hours, easy to overeat when resting.")} />
           </div>
         </section>
 
-        <section className="card !p-3 flex flex-col h-[320px]">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xs uppercase tracking-wide text-gray-500 font-bold">{tr("Today's log")} {entries.length > 0 && <span className="text-duo-greenDark">· {entries.length}</span>}</h2>
-            {entries.length > 0 && (
-              <button onClick={()=>setEntries([])} className="text-xs font-bold text-duo-red hover:underline">
-                {tr("Remove all")}
-              </button>
-            )}
+        {/* TODAY'S LOG — 2 tabs: log entries + activity level */}
+        <section className="card !p-3 flex flex-col h-[340px]">
+          <div className="flex gap-2 mb-2 border-b-2 border-gray-100">
+            <TabBtn active={logTab === "log"}      onClick={()=>setLogTab("log")}>
+              {tr("Today's log")}{entries.length > 0 && ` · ${entries.length}`}
+            </TabBtn>
+            <TabBtn active={logTab === "activity"} onClick={()=>setLogTab("activity")}>{tr("⚡ Activity level")}</TabBtn>
           </div>
-          <div className="flex-1 min-h-0">
-            {entries.length === 0 ? (
-              <div className="text-sm text-gray-400 h-full flex items-center justify-center text-center px-4">{tr("Nothing logged yet. Add food below ↓")}</div>
-            ) : (
-              <ul className="divide-y h-full overflow-y-auto">
-                {entries.map(e => (
-                  <li key={e.food.id} className="py-2 flex items-center gap-2">
-                    <span className="text-xl">{e.food.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-sm">{e.food.name}</div>
-                      <div className="text-xs text-gray-500">{Math.round(e.food.kcal*e.servings)} kcal</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={()=>setServings(e.food.id, e.servings - 1)} className="btn-duo-soft !px-2 !py-0.5 text-sm">−</button>
-                      <div className="w-7 text-center font-extrabold text-sm">{e.servings}×</div>
-                      <button onClick={()=>setServings(e.food.id, e.servings + 1)} className="btn-duo-soft !px-2 !py-0.5 text-sm">+</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+
+          {logTab === "log" ? (
+            <>
+              {entries.length > 0 && (
+                <div className="flex justify-end mb-1">
+                  <button onClick={()=>setEntries([])} className="text-xs font-bold text-duo-red hover:underline">
+                    {tr("Remove all")}
+                  </button>
+                </div>
+              )}
+              <div className="flex-1 min-h-0">
+                {entries.length === 0 ? (
+                  <div className="text-sm text-gray-400 h-full flex items-center justify-center text-center px-4">{tr("Nothing logged yet. Add food below ↓")}</div>
+                ) : (
+                  <ul className="divide-y h-full overflow-y-auto">
+                    {entries.map(e => (
+                      <li key={e.food.id} className="py-2 flex items-center gap-2">
+                        <span className="text-xl">{e.food.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold truncate text-sm">{e.food.name}</div>
+                          <div className="text-xs text-gray-500">{Math.round(e.food.kcal*e.servings)} kcal</div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button onClick={()=>setServings(e.food.id, e.servings - 1)} className="btn-duo-soft !px-2 !py-0.5 text-sm">−</button>
+                          <div className="w-7 text-center font-extrabold text-sm">{e.servings}×</div>
+                          <button onClick={()=>setServings(e.food.id, e.servings + 1)} className="btn-duo-soft !px-2 !py-0.5 text-sm">+</button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+              <ActivityPanel
+                currentActivity={profile.activity}
+                onChange={(act)=>updateProfile({ activity: act })}
+                overCalories={totals.kcal > t.calories}
+                overCarbs={totals.carbs > t.carbs}
+                kcalOver={Math.max(0, Math.round(totals.kcal - t.calories))}
+                tr={tr}
+              />
+            </div>
+          )}
         </section>
       </div>
 
       <section className="card">
-        <div className="flex gap-2 mb-4 border-b-2 border-gray-100">
-          <TabBtn active={tab === "food"}     onClick={()=>setTab("food")}>{tr("🍽️ Add food")}</TabBtn>
-          <TabBtn active={tab === "activity"} onClick={()=>setTab("activity")}>{tr("⚡ Activity level")}</TabBtn>
-        </div>
-
-        {tab === "food" ? (
-          <>
+        <h2 className="text-lg font-extrabold mb-3">{tr("🍽️ Add food")}</h2>
+        <>
             <div className="flex items-center gap-3 mb-3 flex-wrap">
               <input
                 type="search"
@@ -167,17 +181,7 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
               })}
               {filtered.length === 0 && <div className="py-4 text-sm text-gray-500 text-center sm:col-span-2">{tr("No match. Try another keyword.")}</div>}
             </div>
-          </>
-        ) : (
-          <ActivityPanel
-            currentActivity={profile.activity}
-            onChange={(act)=>updateProfile({ activity: act })}
-            overCalories={totals.kcal > t.calories}
-            overCarbs={totals.carbs > t.carbs}
-            kcalOver={Math.max(0, Math.round(totals.kcal - t.calories))}
-            tr={tr}
-          />
-        )}
+        </>
       </section>
     </div>
   );
