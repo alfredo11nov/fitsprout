@@ -49,26 +49,29 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
       : prev.map(e => e.food.id === id ? { ...e, servings: s } : e)));
 
   const feedback = buildFeedback(totals, t, profile.goal, tr);
+  const reaction = reactionEmoji(profile.goal, totals.kcal, t.calories, entries.length > 0);
 
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-4 md:items-stretch">
-        {/* TODAY'S TOTALS — avatar coach on top, sliders at the bottom */}
-        <section className="card !p-4 flex flex-col h-[340px]">
-          <div className="flex items-start gap-3">
-            <GeminiMascot goal={profile.goal} size={64} mood={feedback.mood} />
-            <div className="flex-1 min-w-0">
-              <div className="text-xs uppercase tracking-wide text-gray-500 font-bold">{tr("Today's totals")}</div>
-              <div className="font-extrabold text-sm leading-tight">{feedback.title}</div>
-              <div className="text-xs text-gray-600 leading-snug">{feedback.body}</div>
-            </div>
+        {/* TODAY'S TOTALS — avatar coach centered on top, sliders at the bottom */}
+        <section className="card !p-4 flex flex-col h-[360px]">
+          <div className="relative flex flex-col items-center text-center">
             {onEditGoal && (
-              <button onClick={onEditGoal} className="text-xs font-bold text-duo-red hover:underline shrink-0">
+              <button onClick={onEditGoal} className="absolute right-0 top-0 text-xs font-bold text-duo-red hover:underline">
                 {tr("✏️ Edit your goal")}
               </button>
             )}
+            <div className="text-xs uppercase tracking-wide text-gray-500 font-bold">{tr("Today's totals")}</div>
+            <div className="my-1 h-24 flex items-center justify-center">
+              {reaction
+                ? <span className="text-7xl leading-none select-none" role="img" aria-label="status">{reaction}</span>
+                : <GeminiMascot goal={profile.goal} size={96} mood={feedback.mood} />}
+            </div>
+            <div className="font-extrabold text-sm leading-tight">{feedback.title}</div>
+            <div className="text-xs text-gray-600 leading-snug">{feedback.body}</div>
           </div>
-          <div className="mt-auto space-y-3 pt-4">
+          <div className="mt-auto space-y-3 pt-3">
             <MacroRow label={tr("Calories")} emoji="🔥" value={totals.kcal}    target={t.calories} unit="kcal" color="#FFC800" info={tr("Calories are the energy in your food. Your body uses them to move, think and stay alive. Eat about the same as your target to keep your weight steady — more adds weight, less loses it.")} />
             <MacroRow label={tr("Protein")}  emoji="🥩" value={totals.protein} target={t.protein}  unit="g"    color="#FF4B4B" info={tr("Protein is the building block for muscle. It repairs your body after exercise and keeps you feeling full. Found in chicken, eggs, fish, tofu and beans.")} />
             <MacroRow label={tr("Carbs")}    emoji="🍚" value={totals.carbs}   target={t.carbs}    unit="g"    color="#1CB0F6" info={tr("Carbs (carbohydrates) are your body's main fuel for energy. Found in rice, noodles, bread, fruit and sweet drinks. Great around active hours, easy to overeat when resting.")} />
@@ -304,6 +307,16 @@ function MacroRow({ label, emoji, value, target, unit, color, info }: { label: s
       </div>
     </div>
   );
+}
+
+// Swap the mascot for a reaction emoji based on goal + whether intake is over/under target.
+// Maintain goal (and empty log) keeps the mascot.
+function reactionEmoji(goal: string, kcal: number, target: number, hasEntries: boolean): string | null {
+  if (!hasEntries) return null;
+  const over = kcal > target;
+  if (goal === "build") return over ? "😋" : "😥";
+  if (goal === "slim")  return over ? "😒" : "🥰";
+  return null;
 }
 
 function buildFeedback(totals: { kcal: number; protein: number; carbs: number }, t: { calories: number; protein: number; carbs: number }, goal: string, tr: (s: string) => string) {
