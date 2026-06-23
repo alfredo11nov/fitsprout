@@ -29,8 +29,8 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return FOODS.filter(f => (q ? f.name.toLowerCase().includes(q) : f.category === cat));
-  }, [query, cat]);
+    return FOODS.filter(f => (q ? (f.name.toLowerCase().includes(q) || tr(f.name).toLowerCase().includes(q)) : f.category === cat));
+  }, [query, cat, tr]);
 
   const add = (food: Food) =>
     setEntries(prev => {
@@ -105,7 +105,7 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
                       <li key={e.food.id} className="py-2 flex items-center gap-2">
                         <span className="text-xl">{e.food.emoji}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="font-bold truncate text-sm">{e.food.name}</div>
+                          <div className="font-bold truncate text-sm">{tr(e.food.name)}</div>
                           <div className="text-xs text-gray-500">{Math.round(e.food.kcal*e.servings)} kcal</div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -164,9 +164,9 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
                     className={`flex items-center gap-3 p-2 rounded-chunk border-2 transition ${added ? "border-duo-green bg-green-50" : "border-gray-100 hover:border-duo-green"}`}>
                     <span className="text-2xl shrink-0">{f.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-sm">{f.name}</div>
+                      <div className="font-bold truncate text-sm">{tr(f.name)}</div>
                       <div className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
-                        <span>{f.portion} · {f.kcal} kcal</span>
+                        <span>{tr(f.portion)} · {f.kcal} kcal</span>
                         <MacroDots grams={f.protein} icon="🥩" label="protein" />
                         <MacroDots grams={f.carbs}   icon="🍚" label="carbs" />
                       </div>

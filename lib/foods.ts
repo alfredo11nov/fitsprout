@@ -37,6 +37,32 @@ export const FOODS: Food[] = [
   { id: "avocado",   name: "Avocado",            category: "whole", emoji: "🥑", portion: "½ fruit (100 g)", kcal: 160, protein: 2, carbs: 9, fat: 15 },
   { id: "nuts",      name: "Mixed nuts",         category: "whole", emoji: "🥜", portion: "30 g handful",   kcal: 180, protein: 6,  carbs: 6,  fat: 16 },
 
+  // ── Common SG vegetables (6 types × boiled + stir-fried = 12) ──
+  { id: "kailan_boil",  name: "Kai lan (boiled)",        category: "whole", emoji: "🥬", portion: "150 g", kcal: 45,  protein: 4, carbs: 7,  fat: 1 },
+  { id: "kailan_fry",   name: "Kai lan (oyster sauce)",  category: "whole", emoji: "🥬", portion: "150 g", kcal: 150, protein: 5, carbs: 10, fat: 11 },
+  { id: "kangkong_boil",name: "Kangkong (boiled)",       category: "whole", emoji: "🥬", portion: "150 g", kcal: 40,  protein: 3, carbs: 6,  fat: 0 },
+  { id: "kangkong_fry", name: "Sambal kangkong",         category: "whole", emoji: "🌶️", portion: "150 g", kcal: 160, protein: 4, carbs: 12, fat: 11 },
+  { id: "chyesim_boil", name: "Chye sim (boiled)",       category: "whole", emoji: "🥬", portion: "150 g", kcal: 35,  protein: 3, carbs: 5,  fat: 0 },
+  { id: "chyesim_fry",  name: "Chye sim (garlic)",       category: "whole", emoji: "🥬", portion: "150 g", kcal: 140, protein: 4, carbs: 9,  fat: 10 },
+  { id: "cabbage_boil", name: "Cabbage (boiled)",        category: "whole", emoji: "🥬", portion: "150 g", kcal: 40,  protein: 2, carbs: 9,  fat: 0 },
+  { id: "cabbage_fry",  name: "Cabbage (stir-fried)",    category: "whole", emoji: "🥬", portion: "150 g", kcal: 145, protein: 3, carbs: 12, fat: 10 },
+  { id: "longbean_boil",name: "Long beans (boiled)",     category: "whole", emoji: "🫛", portion: "150 g", kcal: 55,  protein: 3, carbs: 11, fat: 0 },
+  { id: "longbean_fry", name: "Long beans (stir-fried)", category: "whole", emoji: "🫛", portion: "150 g", kcal: 165, protein: 4, carbs: 14, fat: 11 },
+  { id: "broccoli_boil",name: "Broccoli (boiled)",       category: "whole", emoji: "🥦", portion: "150 g", kcal: 52,  protein: 4, carbs: 10, fat: 1 },
+  { id: "broccoli_fry", name: "Broccoli (sautéed)",      category: "whole", emoji: "🥦", portion: "150 g", kcal: 150, protein: 5, carbs: 12, fat: 10 },
+
+  // ── Common SG/ID fruits (10) ──
+  { id: "orange",     name: "Orange",       category: "whole", emoji: "🍊", portion: "1 medium",        kcal: 62,  protein: 1, carbs: 15, fat: 0 },
+  { id: "mango",      name: "Mango",        category: "whole", emoji: "🥭", portion: "½ fruit (150 g)", kcal: 100, protein: 1, carbs: 25, fat: 0 },
+  { id: "papaya",     name: "Papaya",       category: "whole", emoji: "🟠", portion: "150 g",           kcal: 60,  protein: 1, carbs: 15, fat: 0 },
+  { id: "watermelon", name: "Watermelon",   category: "whole", emoji: "🍉", portion: "200 g",           kcal: 60,  protein: 1, carbs: 15, fat: 0 },
+  { id: "durian",     name: "Durian",       category: "whole", emoji: "🥥", portion: "100 g (3 seeds)", kcal: 147, protein: 2, carbs: 27, fat: 5 },
+  { id: "mangosteen", name: "Mangosteen",   category: "whole", emoji: "🟣", portion: "100 g",           kcal: 73,  protein: 0, carbs: 18, fat: 0 },
+  { id: "rambutan",   name: "Rambutan",     category: "whole", emoji: "🔴", portion: "100 g (~8)",      kcal: 75,  protein: 1, carbs: 19, fat: 0 },
+  { id: "guava",      name: "Guava",        category: "whole", emoji: "🟢", portion: "1 fruit (120 g)", kcal: 68,  protein: 3, carbs: 14, fat: 1 },
+  { id: "dragonfruit",name: "Dragon fruit", category: "whole", emoji: "🩷", portion: "150 g",           kcal: 90,  protein: 2, carbs: 20, fat: 0 },
+  { id: "lychee",     name: "Lychee",       category: "whole", emoji: "🌸", portion: "100 g (~9)",      kcal: 66,  protein: 1, carbs: 17, fat: 0 },
+
   // ── Local cuisine (20) ──
   { id: "porkporridge",  name: "Pork porridge",       category: "local", emoji: "🥣", portion: "1 bowl",        kcal: 350, protein: 18, carbs: 50, fat: 8 },
   { id: "chickenrice",   name: "Hainanese chicken rice", category: "local", emoji: "🍗", portion: "1 plate",    kcal: 600, protein: 30, carbs: 70, fat: 22 },
@@ -102,6 +128,18 @@ export const FOODS: Food[] = [
   { id: "cookie",        name: "Chocolate chip cookies",         category: "drink", emoji: "🍪", portion: "2 pieces",         kcal: 220, protein: 2, carbs: 28, fat: 11 },
   { id: "donut",         name: "Glazed donut",                   category: "drink", emoji: "🍩", portion: "1 piece",          kcal: 260, protein: 4, carbs: 31, fat: 14 },
   { id: "popcorn",       name: "Sweet popcorn",                  category: "drink", emoji: "🍿", portion: "30 g",             kcal: 150, protein: 2, carbs: 25, fat: 5 },
+
+  // ── Indonesian popular snacks (10) ──
+  { id: "keripiktempe",  name: "Tempeh chips (keripik tempe)",   category: "drink", emoji: "🟤", portion: "30 g",      kcal: 150, protein: 7, carbs: 12, fat: 8 },
+  { id: "keripiksingkong",name: "Cassava chips (keripik singkong)", category: "drink", emoji: "🥔", portion: "30 g",   kcal: 160, protein: 1, carbs: 18, fat: 9 },
+  { id: "astor",         name: "Chocolate wafer sticks",         category: "drink", emoji: "🍫", portion: "4 sticks",  kcal: 180, protein: 2, carbs: 24, fat: 9 },
+  { id: "driedmango",    name: "Dried mango",                    category: "drink", emoji: "🥭", portion: "40 g",      kcal: 130, protein: 1, carbs: 32, fat: 0 },
+  { id: "pisangsale",    name: "Dried banana (pisang sale)",     category: "drink", emoji: "🍌", portion: "40 g",      kcal: 120, protein: 1, carbs: 30, fat: 0 },
+  { id: "rengginang",    name: "Rengginang (rice cracker)",      category: "drink", emoji: "🍘", portion: "30 g",      kcal: 140, protein: 2, carbs: 20, fat: 6 },
+  { id: "kacangatom",    name: "Coated peanuts (kacang atom)",   category: "drink", emoji: "🥜", portion: "30 g",      kcal: 150, protein: 5, carbs: 15, fat: 8 },
+  { id: "klepon",        name: "Klepon",                         category: "drink", emoji: "🟢", portion: "4 pieces",  kcal: 180, protein: 2, carbs: 32, fat: 5 },
+  { id: "martabakmanis", name: "Martabak manis (sweet)",         category: "drink", emoji: "🥞", portion: "1 slice",   kcal: 300, protein: 6, carbs: 40, fat: 13 },
+  { id: "kuecubit",      name: "Kue cubit",                      category: "drink", emoji: "🧁", portion: "4 pieces",  kcal: 160, protein: 3, carbs: 26, fat: 5 },
 ];
 
 export const CATEGORY_META: Record<FoodCategory, { label: string; tagline: string }> = {

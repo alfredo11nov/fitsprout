@@ -93,8 +93,8 @@ function MacroDrawer({ macro, target, onClose, tr }: { macro: "calories"|"protei
             <li key={f.id} className="py-2 flex items-center gap-3">
               <span className="text-2xl">{f.emoji}</span>
               <div className="flex-1">
-                <div className="font-bold">{f.name}</div>
-                <div className="text-xs text-gray-500">{f.portion}</div>
+                <div className="font-bold">{tr(f.name)}</div>
+                <div className="text-xs text-gray-500">{tr(f.portion)}</div>
               </div>
               <div className="font-extrabold text-duo-greenDark">
                 {macro === "calories" ? `${f.kcal} kcal` : macro === "protein" ? `${f.protein} g` : `${f.carbs} g`}
