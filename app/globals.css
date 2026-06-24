@@ -27,3 +27,10 @@ html, body { background: #FFF9EC; color: #3C3C3C; }
   35%      { box-shadow: 0 0 0 3px rgba(88,204,2,0.5); }
 }
 .bar-flash { animation: barFlash 0.6s ease-out; }
+
+/* Slide-up bottom sheet (Add food panel) */
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.sheet-up { animation: sheetUp 0.28s ease-out; }

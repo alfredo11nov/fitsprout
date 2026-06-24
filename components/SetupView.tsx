@@ -13,7 +13,7 @@ export function SetupView({ onDone }: { onDone: () => void }) {
       <section className="card">
         <h1 className="text-2xl font-extrabold mb-1">{t("Hi! What's your goal? 🌱")}</h1>
         <p className="text-sm text-gray-500 mb-4">{t("Pick a buddy. We'll show you the daily food you need.")}</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {GOAL_ORDER.map((g) => {
             const meta = GOAL_META[g];
             const active = profile.goal === g;
@@ -21,15 +21,20 @@ export function SetupView({ onDone }: { onDone: () => void }) {
               <button
                 key={g}
                 onClick={() => update({ goal: g })}
-                className={`rounded-chunk border-2 p-3 flex flex-col items-center transition ${
+                className={`rounded-chunk border-2 p-3 flex items-center gap-4 text-left sm:flex-col sm:items-center sm:gap-1 sm:text-center transition ${
                   active
                     ? "border-duo-green bg-green-50 shadow-chunkGreen -translate-y-0.5"
                     : "border-gray-200 bg-white shadow-chunk hover:-translate-y-0.5"
                 }`}
               >
-                <GeminiMascot goal={g} size={90} />
-                <div className="font-extrabold mt-1">{t(meta.label)}</div>
-                <div className="text-xs text-gray-500">{t(meta.tagline)}</div>
+                <div className="shrink-0">
+                  <GeminiMascot goal={g} size={72} />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-extrabold sm:mt-1">{t(meta.label)}</div>
+                  <div className="text-xs text-gray-500">{t(meta.tagline)}</div>
+                </div>
+                {active && <span className="ml-auto sm:hidden text-duo-greenDark font-extrabold text-xl">✓</span>}
               </button>
             );
           })}

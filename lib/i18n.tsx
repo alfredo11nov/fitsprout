@@ -77,6 +77,7 @@ const DICT_ID: Record<string, string> = {
   "Remove all":     "Hapus semua",
   "Nothing logged yet. Add food below ↓": "Belum ada catatan. Tambah makanan di bawah ↓",
   "🍽️ Add food":      "🍽️ Tambah makanan",
+  "Done":             "Selesai",
   "⚡ Activity level": "⚡ Tingkat aktivitas",
   "Search… e.g. chicken rice, milo, banana": "Cari… misal nasi ayam, milo, pisang",
   "+ Add":     "+ Tambah",

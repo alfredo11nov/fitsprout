@@ -15,6 +15,9 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<FoodCategory>("local");
   const [logTab, setLogTab] = useState<"log" | "activity">("log");
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [searchCollapsed, setSearchCollapsed] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const tr = useT();
 
   const totals = entries.reduce(
@@ -134,58 +137,89 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
         </section>
       </div>
 
-      <section className="card">
-        <h2 className="text-lg font-extrabold mb-3">{tr("🍽️ Add food")}</h2>
-        <>
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <input
-                type="search"
-                value={query}
-                onChange={(e)=>setQuery(e.target.value)}
-                placeholder={tr("Search… e.g. chicken rice, milo, banana")}
-                className="basis-[30%] grow-0 shrink-0 px-4 py-3 rounded-chunk border-2 border-gray-200 font-bold focus:border-duo-green outline-none"
-              />
-              {!query && (
-                <div className="flex gap-2 flex-nowrap overflow-x-auto pb-1 -mx-1 px-1 flex-1 min-w-0">
-                  {(Object.keys(CATEGORY_META) as FoodCategory[]).map(c => (
-                    <button key={c} onClick={()=>setCat(c)}
-                      className={`btn-duo-soft shrink-0 whitespace-nowrap ${cat===c ? "!bg-duo-green !text-white !border-duo-greenDark" : ""}`}>
-                      {tr(CATEGORY_META[c].label)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="grid sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
-              {filtered.map(f => {
-                const added = entries.find(e => e.food.id === f.id);
-                return (
-                  <div key={f.id}
-                    className={`flex items-center gap-3 p-2 rounded-chunk border-2 transition ${added ? "border-duo-green bg-green-50" : "border-gray-100 hover:border-duo-green"}`}>
-                    <span className="text-2xl shrink-0">{f.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate text-sm">{tr(f.name)}</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
-                        <span>{tr(f.portion)} · {f.kcal} kcal</span>
-                        <MacroDots grams={f.protein} icon="🥩" label="protein" />
-                        <MacroDots grams={f.carbs}   icon="🍚" label="carbs" />
-                      </div>
-                    </div>
-                    {added ? (
-                      <button onClick={()=>add(f)}
-                        className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-chunk bg-white border-2 border-duo-green text-duo-greenDark font-extrabold text-xs">
-                        {tr("✓ Added")}{added.servings > 1 && ` ${added.servings}×`}
+      <button
+        onClick={()=>setSheetOpen(true)}
+        className="btn-duo w-full !py-4 text-base">
+        {tr("🍽️ Add food")}
+      </button>
+
+      {sheetOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/40" onClick={()=>setSheetOpen(false)} />
+          <div className="sheet-up relative w-full max-w-3xl bg-white rounded-t-chunk shadow-chunk max-h-[92vh] flex flex-col">
+            {/* Sticky header */}
+            <div className="px-4 pt-3 pb-2 border-b-2 border-gray-100">
+              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-gray-200" />
+              <div className="flex items-center gap-3">
+                {searchCollapsed ? (
+                  <button
+                    onClick={()=>{ setSearchCollapsed(false); setTimeout(()=>searchInputRef.current?.focus(), 0); }}
+                    aria-label={tr("Search… e.g. chicken rice, milo, banana")}
+                    className="shrink-0 w-11 h-11 rounded-chunk border-2 border-gray-200 flex items-center justify-center text-lg">
+                    🔍
+                  </button>
+                ) : (
+                  <input
+                    ref={searchInputRef}
+                    type="search"
+                    value={query}
+                    onChange={(e)=>setQuery(e.target.value)}
+                    placeholder={tr("Search… e.g. chicken rice, milo, banana")}
+                    className="basis-[45%] grow-0 shrink-0 px-4 py-2.5 rounded-chunk border-2 border-gray-200 font-bold focus:border-duo-green outline-none transition-all"
+                  />
+                )}
+                {!query && (
+                  <div
+                    onScroll={(e)=>setSearchCollapsed(e.currentTarget.scrollLeft > 8)}
+                    className="flex gap-2 flex-nowrap overflow-x-auto pb-1 -mx-1 px-1 flex-1 min-w-0">
+                    {(Object.keys(CATEGORY_META) as FoodCategory[]).map(c => (
+                      <button key={c} onClick={()=>setCat(c)}
+                        className={`btn-duo-soft shrink-0 whitespace-nowrap ${cat===c ? "!bg-duo-green !text-white !border-duo-greenDark" : ""}`}>
+                        {tr(CATEGORY_META[c].label)}
                       </button>
-                    ) : (
-                      <button onClick={()=>add(f)} className="btn-duo !px-2.5 !py-1 text-xs shrink-0">{tr("+ Add")}</button>
-                    )}
+                    ))}
                   </div>
-                );
-              })}
-              {filtered.length === 0 && <div className="py-4 text-sm text-gray-500 text-center sm:col-span-2">{tr("No match. Try another keyword.")}</div>}
+                )}
+                <button onClick={()=>setSheetOpen(false)} className="btn-duo shrink-0 !px-4 !py-2 text-sm">
+                  {tr("Done")}
+                </button>
+              </div>
             </div>
-        </>
-      </section>
+
+            {/* Scrollable food grid */}
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              <div className="grid sm:grid-cols-2 gap-2">
+                {filtered.map(f => {
+                  const added = entries.find(e => e.food.id === f.id);
+                  return (
+                    <div key={f.id}
+                      className={`flex items-center gap-3 p-2 rounded-chunk border-2 transition ${added ? "border-duo-green bg-green-50" : "border-gray-100 hover:border-duo-green"}`}>
+                      <span className="text-2xl shrink-0">{f.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold truncate text-sm">{tr(f.name)}</div>
+                        <div className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
+                          <span>{tr(f.portion)} · {f.kcal} kcal</span>
+                          <MacroDots grams={f.protein} icon="🥩" label="protein" />
+                          <MacroDots grams={f.carbs}   icon="🍚" label="carbs" />
+                        </div>
+                      </div>
+                      {added ? (
+                        <button onClick={()=>add(f)}
+                          className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-chunk bg-white border-2 border-duo-green text-duo-greenDark font-extrabold text-xs">
+                          {tr("✓ Added")}{added.servings > 1 && ` ${added.servings}×`}
+                        </button>
+                      ) : (
+                        <button onClick={()=>add(f)} className="btn-duo !px-2.5 !py-1 text-xs shrink-0">{tr("+ Add")}</button>
+                      )}
+                    </div>
+                  );
+                })}
+                {filtered.length === 0 && <div className="py-4 text-sm text-gray-500 text-center sm:col-span-2">{tr("No match. Try another keyword.")}</div>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
