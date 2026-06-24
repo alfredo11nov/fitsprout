@@ -2,7 +2,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useProfile } from "@/lib/urlState";
 import { targets, ACTIVITY_OPTIONS } from "@/lib/nutrition";
-import { FOODS, CATEGORY_META, type FoodCategory, type Food } from "@/lib/foods";
+import { FOODS, CATEGORY_META, foodSearchText, type FoodCategory, type Food } from "@/lib/foods";
 import { useT } from "@/lib/i18n";
 import { GeminiMascot } from "@/components/GeminiMascot";
 
@@ -32,7 +32,7 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return FOODS.filter(f => (q ? (f.name.toLowerCase().includes(q) || tr(f.name).toLowerCase().includes(q)) : f.category === cat));
+    return FOODS.filter(f => (q ? (foodSearchText(f).includes(q) || tr(f.name).toLowerCase().includes(q)) : f.category === cat));
   }, [query, cat, tr]);
 
   const add = (food: Food) =>
@@ -323,7 +323,7 @@ function MacroRow({ label, emoji, value, target, unit, color, info }: { label: s
               className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold transition ${showInfo ? "bg-duo-green text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"}`}
             >i</button>
             {showInfo && (
-              <div className="absolute left-0 top-6 z-30 w-60 bg-duo-ink text-white text-xs font-normal leading-snug rounded-chunk px-3 py-2 shadow-chunk">
+              <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-[min(16rem,calc(100vw-2rem))] bg-duo-ink text-white text-xs font-normal leading-snug rounded-chunk px-3 py-2 shadow-chunk">
                 {info}
               </div>
             )}

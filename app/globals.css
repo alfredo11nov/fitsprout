@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body { background: #FFF9EC; color: #3C3C3C; }
+html, body { background: #FFF9EC; color: #3C3C3C; overflow-x: hidden; }
 
 .btn-duo {
   @apply inline-flex items-center justify-center px-5 py-3 rounded-chunk font-bold uppercase tracking-wide text-white bg-duo-green shadow-chunkGreen active:translate-y-[2px] active:shadow-none transition;

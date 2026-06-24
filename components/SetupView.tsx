@@ -136,7 +136,7 @@ function Field({ label, value, min, max, onChange, hint, info, infoNode, onReset
         {(info || infoNode) && (
           <span className="relative group">
             <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold cursor-help">i</span>
-            <span className="pointer-events-auto absolute left-5 top-0 z-20 w-72 bg-duo-ink text-white text-xs font-normal rounded-chunk px-3 py-2 shadow-chunk opacity-0 group-hover:opacity-100 transition">
+            <span className="pointer-events-auto absolute top-6 right-0 sm:left-5 sm:right-auto z-20 w-[min(18rem,calc(100vw-2.5rem))] bg-duo-ink text-white text-xs font-normal rounded-chunk px-3 py-2 shadow-chunk opacity-0 group-hover:opacity-100 transition">
               {infoNode ?? info}
             </span>
           </span>

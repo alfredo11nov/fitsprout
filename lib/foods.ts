@@ -147,3 +147,35 @@ export const CATEGORY_META: Record<FoodCategory, { label: string; tagline: strin
   local: { label: "Local cuisine",      tagline: "SG/MY hawker favourites" },
   drink: { label: "Snack & drinks",     tagline: "Treats, sweets, coffee, tea & soda" },
 };
+
+// Searchable metadata tags per food group — boosts findability
+// (e.g. searching "fruit", "veggie", "soft drink", "coffee" surfaces the right items).
+const TAG_SETS: Record<string, string[]> = {
+  "fruit":            ["orange","mango","papaya","watermelon","durian","mangosteen","rambutan","guava","dragonfruit","lychee","banana","apple","pineapple"],
+  "vegetable veggie greens": ["kailan_boil","kailan_fry","kangkong_boil","kangkong_fry","chyesim_boil","chyesim_fry","cabbage_boil","cabbage_fry","longbean_boil","longbean_fry","broccoli_boil","broccoli_fry","broccoli","spinach"],
+  "soft drink soda fizzy": ["coke","cokezero","sprite","100plus"],
+  "coffee":           ["kopiO","kopiOkosong","kopi"],
+  "tea":              ["teh","tehsiu","milktea","milkteaLess"],
+  "milk dairy":       ["milkfull","milklow","soymilk","milo"],
+  "juice":            ["oj"],
+  "alcohol":          ["beer","wine"],
+  "noodle noodles":   ["noodle","miegoreng","charkway","laksa","wantonmee","fishballnoodle"],
+  "rice":             ["rice","brownrice","chickenrice","nasilemak","thundertea","ekkado"],
+  "protein meat":     ["egg","chickbrst","beef","salmon","fish","tofu","tempeh","proteinshake"],
+  "snack sweet dessert": ["goreng_pisang","chips","milkchoc","darkchoc","icecream","currypuff","kuehlapis","ondehondeh","pineappletart","kayatoast","softserve","mochi","eggtart","mooncake","apombalik","murukku","keropok","cookie","donut","popcorn","keripiktempe","keripiksingkong","astor","driedmango","pisangsale","rengginang","kacangatom","klepon","martabakmanis","kuecubit"],
+};
+
+// Reverse index: food id → space-joined tag keywords.
+const ID_TAGS: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const [tags, ids] of Object.entries(TAG_SETS)) {
+    for (const id of ids) map[id] = map[id] ? `${map[id]} ${tags}` : tags;
+  }
+  return map;
+})();
+
+// Lowercased blob (name + category + tags) used for fuzzy in-app search.
+export function foodSearchText(food: Food): string {
+  const cat = food.category === "drink" ? "snack drink beverage" : food.category === "local" ? "local cuisine hawker" : "whole food";
+  return `${food.name} ${cat} ${ID_TAGS[food.id] ?? ""}`.toLowerCase();
+}
