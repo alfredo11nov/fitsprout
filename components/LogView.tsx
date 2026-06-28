@@ -17,8 +17,13 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
   const [logTab, setLogTab] = useState<"log" | "activity">("log");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchCollapsed, setSearchCollapsed] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const dragStartY = useRef<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const tr = useT();
+
+  const closeSheet = () => { setSheetOpen(false); setDragY(0); };
 
   const totals = entries.reduce(
     (acc, e) => ({
@@ -143,15 +148,33 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
         {tr("🍽️ Add food")}
       </button>
 
-      {sheetOpen && (
+      {sheetOpen && (() => {
+        const collapsedBtn = searchCollapsed && !searchFocused && !query;
+        const searchFull = searchFocused || !!query;
+        return (
         <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/40" onClick={()=>setSheetOpen(false)} />
-          <div className="sheet-up relative w-full max-w-3xl bg-white rounded-t-chunk shadow-chunk max-h-[92vh] flex flex-col">
-            {/* Sticky header */}
-            <div className="px-4 pt-3 pb-2 border-b-2 border-gray-100">
-              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-gray-200" />
-              <div className="flex items-center gap-3">
-                {searchCollapsed ? (
+          <div className="absolute inset-0 bg-black/40" onClick={closeSheet} />
+          <div
+            className={`sheet-up relative w-full max-w-3xl bg-white rounded-t-chunk shadow-chunk max-h-[92vh] flex flex-col ${dragY ? "" : "transition-transform"}`}
+            style={{ transform: dragY ? `translateY(${dragY}px)` : undefined }}
+          >
+            {/* Sticky header — drag handle area swipes the sheet down */}
+            <div
+              className="px-4 pt-3 pb-2 border-b-2 border-gray-100"
+              onTouchStart={(e)=>{ dragStartY.current = e.touches[0].clientY; }}
+              onTouchMove={(e)=>{
+                if (dragStartY.current === null) return;
+                const d = e.touches[0].clientY - dragStartY.current;
+                if (d > 0) setDragY(d);
+              }}
+              onTouchEnd={()=>{
+                if (dragY > 90) closeSheet(); else setDragY(0);
+                dragStartY.current = null;
+              }}
+            >
+              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-gray-300" />
+              <div className="flex items-center gap-2">
+                {collapsedBtn ? (
                   <button
                     onClick={()=>{ setSearchCollapsed(false); setTimeout(()=>searchInputRef.current?.focus(), 0); }}
                     aria-label={tr("Search… e.g. chicken rice, milo, banana")}
@@ -159,16 +182,33 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
                     🔍
                   </button>
                 ) : (
-                  <input
-                    ref={searchInputRef}
-                    type="search"
-                    value={query}
-                    onChange={(e)=>setQuery(e.target.value)}
-                    placeholder={tr("Search… e.g. chicken rice, milo, banana")}
-                    className="basis-[45%] grow-0 shrink-0 px-4 py-2.5 rounded-chunk border-2 border-gray-200 font-bold focus:border-duo-green outline-none transition-all"
-                  />
+                  <div className={`relative flex items-center ${searchFull ? "flex-1" : "basis-1/2 grow-0 shrink-0"}`}>
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={query}
+                      onChange={(e)=>setQuery(e.target.value)}
+                      onFocus={()=>setSearchFocused(true)}
+                      onBlur={()=>setSearchFocused(false)}
+                      placeholder={tr("Search… e.g. chicken rice, milo, banana")}
+                      className="w-full pl-4 pr-16 py-2.5 rounded-chunk border-2 border-gray-200 font-bold focus:border-duo-green outline-none transition-all"
+                    />
+                    {query && (
+                      <div className="absolute right-1.5 flex items-center gap-1">
+                        <button
+                          onClick={()=>{ setQuery(""); searchInputRef.current?.focus(); }}
+                          aria-label="Clear"
+                          className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 font-bold flex items-center justify-center">✕</button>
+                        <button
+                          onMouseDown={(e)=>{ e.preventDefault(); searchInputRef.current?.blur(); }}
+                          onClick={()=>searchInputRef.current?.blur()}
+                          aria-label="Apply search"
+                          className="w-7 h-7 rounded-full bg-duo-green text-white font-bold flex items-center justify-center">✓</button>
+                      </div>
+                    )}
+                  </div>
                 )}
-                {!query && (
+                {!searchFull && (
                   <div
                     onScroll={(e)=>setSearchCollapsed(e.currentTarget.scrollLeft > 8)}
                     className="flex gap-2 flex-nowrap overflow-x-auto pb-1 -mx-1 px-1 flex-1 min-w-0">
@@ -180,9 +220,6 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
                     ))}
                   </div>
                 )}
-                <button onClick={()=>setSheetOpen(false)} className="btn-duo shrink-0 !px-4 !py-2 text-sm">
-                  {tr("Done")}
-                </button>
               </div>
             </div>
 
@@ -217,9 +254,17 @@ export function LogView({ onEditGoal }: { onEditGoal?: () => void } = {}) {
                 {filtered.length === 0 && <div className="py-4 text-sm text-gray-500 text-center sm:col-span-2">{tr("No match. Try another keyword.")}</div>}
               </div>
             </div>
+
+            {/* Sticky footer — Done */}
+            <div className="border-t-2 border-gray-100 p-3">
+              <button onClick={closeSheet} className="btn-duo w-full !py-3">
+                {tr("Done")}{entries.length > 0 && ` · ${entries.length}`}
+              </button>
+            </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

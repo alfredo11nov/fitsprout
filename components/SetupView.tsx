@@ -1,4 +1,5 @@
 "use client";
+import { useState, useRef, useEffect } from "react";
 import { useProfile, suggestedMusclePct } from "@/lib/urlState";
 import { GOAL_META, GOAL_ORDER, ACTIVITY_OPTIONS, type Sex } from "@/lib/nutrition";
 import { GeminiMascot } from "@/components/GeminiMascot";
@@ -129,16 +130,33 @@ function MuscleSource({ currentSex, currentAge }: { currentSex: "male" | "female
 }
 
 function Field({ label, value, min, max, onChange, hint, info, infoNode, onReset, resetLabel }: { label: string; value: number; min: number; max: number; onChange: (v:number)=>void; hint?: string; info?: string; infoNode?: React.ReactNode; onReset?: () => void; resetLabel?: string }) {
+  const [showInfo, setShowInfo] = useState(false);
+  const popRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!showInfo) return;
+    const onDoc = (e: MouseEvent) => {
+      if (popRef.current && !popRef.current.contains(e.target as Node)) setShowInfo(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [showInfo]);
+
   return (
     <div>
       <div className="text-sm font-bold mb-1 flex items-center gap-1">
         <span>{label}</span>
         {(info || infoNode) && (
-          <span className="relative group">
-            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold cursor-help">i</span>
-            <span className="pointer-events-auto absolute top-6 right-0 sm:left-5 sm:right-auto z-20 w-[min(18rem,calc(100vw-2.5rem))] bg-duo-ink text-white text-xs font-normal rounded-chunk px-3 py-2 shadow-chunk opacity-0 group-hover:opacity-100 transition">
-              {infoNode ?? info}
-            </span>
+          <span className="relative" ref={popRef}>
+            <button
+              type="button"
+              onClick={()=>setShowInfo(v => !v)}
+              aria-label={`What is ${label}?`}
+              className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold transition ${showInfo ? "bg-duo-green text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"}`}>i</button>
+            {showInfo && (
+              <span className="absolute top-6 right-0 sm:left-5 sm:right-auto z-20 w-[min(18rem,calc(100vw-2.5rem))] bg-duo-ink text-white text-xs font-normal rounded-chunk px-3 py-2 shadow-chunk">
+                {infoNode ?? info}
+              </span>
+            )}
           </span>
         )}
       </div>
